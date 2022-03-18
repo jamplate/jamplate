@@ -169,4 +169,47 @@ class TreeTest {
         assertSame(f, root.bottom!!.right!!.bottom)
         assertSame(g, root.bottom!!.bottom)
     }
+
+    @Test
+    fun `hierarchy sequence collects all trees except receiver`() {
+        val root = Tree("root", Range(0, 10))
+        val a = Tree("a", Range(8, 1))
+        val b = Tree("b", Range(6, 2))
+        val c = Tree("c", Range(3, 3))
+        val d = Tree("d", Range(0, 2))
+        val e = Tree("e", Range(7, 1))
+        val f = Tree("f", Range(3, 1))
+        val g = Tree("g", Range(6, 1))
+
+        /*
+              0123456789
+        root: ----------
+        a   :         -
+        b   :       --
+        c   :    ---
+        d   : --
+        e   :        -
+        f   :    -
+        g   :       -
+        */
+
+        root.offer(a)
+        root.offer(b)
+        root.offer(c)
+        root.offer(d)
+        root.offer(e)
+        root.offer(f)
+        root.offer(g)
+
+        val hierarchy = f.hierarchy().toList()
+
+        hierarchy.groupBy { it }.forEach { (tree, occurrences) ->
+            assertSame(1, occurrences.size, "Tree yield twice: $tree")
+        }
+
+        assertEquals(
+            setOf(root, a, b, c, d, e, g),
+            hierarchy.toSet()
+        )
+    }
 }

@@ -135,6 +135,70 @@ val <T> Tree<T>.root: Tree<T> get() = this.parent?.root ?: this
 //
 
 /**
+ * Return a sequence of all the trees related to
+ * this tree excluding this tree.
+ *
+ * @return a sequence of the trees related to this.
+ * @since 0.4.0 ~2022.03.18
+ */
+@Contract(pure = true)
+fun <T> Tree<T>.hierarchy(): Sequence<Tree<T>> =
+    this.leftHierarchy() +
+            this.topHierarchy() +
+            this.rightHierarchy() +
+            this.bottomHierarchy()
+
+/**
+ * Return a sequence of all trees related to the
+ * `bottom` of this tree excluding this tree.
+ *
+ * @return a sequence of all trees to the bottom of this tree.
+ * @since 0.4.0 ~2022.03.18
+ */
+@Contract(pure = true)
+fun <T> Tree<T>.bottomHierarchy(): Sequence<Tree<T>> =
+    generateSequence(this.bottom) { it.bottom }
+        .flatMap { sequenceOf(it) + it.rightHierarchy() }
+
+/**
+ * Return a sequence of all trees related to the
+ * `top` of this tree excluding this tree.
+ *
+ * @return a sequence of all trees to the top of this tree.
+ * @since 0.4.0 ~2022.03.18
+ */
+@Contract(pure = true)
+fun <T> Tree<T>.topHierarchy(): Sequence<Tree<T>> =
+    generateSequence(this.top) { it.top }
+        .flatMap { sequenceOf(it) + it.leftHierarchy() + it.rightHierarchy() }
+
+/**
+ * Return a sequence of all trees related to the
+ * `left` of this tree excluding this tree.
+ *
+ * @return a sequence of all trees to the left of this tree.
+ * @since 0.4.0 ~2022.03.18
+ */
+@Contract(pure = true)
+fun <T> Tree<T>.leftHierarchy(): Sequence<Tree<T>> =
+    generateSequence(this.left) { it.left }
+        .flatMap { sequenceOf(it) + it.bottomHierarchy() + it.topHierarchy() }
+
+/**
+ * Return a sequence of all trees related to the
+ * `right` of this tree excluding this tree.
+ *
+ * @return a sequence of all trees to the right of this tree.
+ * @since 0.4.0 ~2022.03.18
+ */
+@Contract(pure = true)
+fun <T> Tree<T>.rightHierarchy(): Sequence<Tree<T>> =
+    generateSequence(this.right) { it.right }
+        .flatMap { sequenceOf(it) + it.bottomHierarchy() }
+
+//
+
+/**
  * Compute the dominance between [tree] and the [other] tree.
  *
  * @param tree the first tree.
