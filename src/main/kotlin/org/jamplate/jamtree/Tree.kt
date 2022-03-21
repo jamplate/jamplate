@@ -57,9 +57,17 @@ data class Tree<T>(
      */
     var value: T,
     /**
-     * The range of this tree.
+     * The first index of this tree.
+     *
+     * @since 0.4.0 ~2022.03.20
      */
-    val range: Range = Range(),
+    val offset: Int = 0,
+    /**
+     * The length of this tree.
+     *
+     * @since 0.4.0 ~2022.03.20
+     */
+    val length: Int = 0,
     /**
      * The weight of this tree.
      */
@@ -92,6 +100,15 @@ data class Tree<T>(
         private const val serialVersionUID: Long = 6655340677472661213L
     }
 }
+
+//
+
+/**
+ * One past the last index of this range.
+ *
+ * @since 0.4.0 ~2022.03.20
+ */
+val Tree<*>.terminal: Int get() = this.offset + this.length
 
 //
 
@@ -208,7 +225,7 @@ fun <T> Tree<T>.rightHierarchy(): Sequence<Tree<T>> =
  */
 @Contract(pure = true)
 fun computeDominance(tree: Tree<*>, other: Tree<*>): Dominance =
-    computeDominance(tree.range.start, tree.range.end, other.range.start, other.range.end)
+    computeDominance(tree.offset, tree.terminal, other.offset, other.terminal)
 
 /**
  * Compute the relation between [tree] and the [other] tree.
@@ -220,7 +237,7 @@ fun computeDominance(tree: Tree<*>, other: Tree<*>): Dominance =
  */
 @Contract(pure = true)
 fun computeRelation(tree: Tree<*>, other: Tree<*>): Relation =
-    computeRelation(tree.range.start, tree.range.end, other.range.start, other.range.end)
+    computeRelation(tree.offset, tree.terminal, other.offset, other.terminal)
 
 /**
  * Compute the intersection between [tree] and the [other] tree.
@@ -232,7 +249,7 @@ fun computeRelation(tree: Tree<*>, other: Tree<*>): Relation =
  */
 @Contract(pure = true)
 fun computeIntersection(tree: Tree<*>, other: Tree<*>): Intersection =
-    computeIntersection(tree.range.start, tree.range.end, other.range.start, other.range.end)
+    computeIntersection(tree.offset, tree.terminal, other.offset, other.terminal)
 
 /**
  * Compute the precedence between [tree] and the [other] tree.
@@ -260,7 +277,7 @@ fun computePrecedence(tree: Tree<*>, other: Tree<*>): Precedence =
  */
 @Contract(pure = true)
 fun computeDominance(tree: Tree<*>, s: Int, e: Int): Dominance =
-    computeDominance(tree.range.start, tree.range.end, s, e)
+    computeDominance(tree.offset, tree.terminal, s, e)
 
 /**
  * Compute the relation between [tree] and a tree with [s] and [e].
@@ -274,7 +291,7 @@ fun computeDominance(tree: Tree<*>, s: Int, e: Int): Dominance =
  */
 @Contract(pure = true)
 fun computeRelation(tree: Tree<*>, s: Int, e: Int): Relation =
-    computeRelation(tree.range.start, tree.range.end, s, e)
+    computeRelation(tree.offset, tree.terminal, s, e)
 
 /**
  * Compute the intersection between [tree] and a tree with [s] and [e].
@@ -288,7 +305,7 @@ fun computeRelation(tree: Tree<*>, s: Int, e: Int): Relation =
  */
 @Contract(pure = true)
 fun computeIntersection(tree: Tree<*>, s: Int, e: Int): Intersection =
-    computeIntersection(tree.range.start, tree.range.end, s, e)
+    computeIntersection(tree.offset, tree.terminal, s, e)
 
 /**
  * Compute the precedence between [tree] and a tree with [w].
@@ -787,7 +804,7 @@ infix fun <T> Tree<T>.offerNext(tree: Tree<T>) {
  */
 @Contract(value = "_->new", pure = true)
 infix fun Tree<*>.compute(tree: Tree<*>): Map<Side?, Tree<*>?> =
-    compute(tree.range.start, tree.range.end, tree.weight)
+    compute(tree.offset, tree.terminal, tree.weight)
 
 /**
  * Assuming the relation between this and [tree] is [SELF],
@@ -806,7 +823,7 @@ infix fun Tree<*>.compute(tree: Tree<*>): Map<Side?, Tree<*>?> =
  */
 @Contract(value = "_->new", pure = true)
 infix fun Tree<*>.computeSelf(tree: Tree<*>): Map<Side?, Tree<*>?> =
-    computeSelf(tree.range.start, tree.range.end, tree.weight)
+    computeSelf(tree.offset, tree.terminal, tree.weight)
 
 /**
  * Assuming the relation between this and [tree] is [CHILD],
@@ -825,7 +842,7 @@ infix fun Tree<*>.computeSelf(tree: Tree<*>): Map<Side?, Tree<*>?> =
  */
 @Contract(value = "_->new", pure = true)
 infix fun Tree<*>.computeChild(tree: Tree<*>): Map<Side?, Tree<*>?> =
-    computeChild(tree.range.start, tree.range.end, tree.weight)
+    computeChild(tree.offset, tree.terminal, tree.weight)
 
 /**
  * Assuming the relation between this and [tree] is [PARENT],
@@ -844,7 +861,7 @@ infix fun Tree<*>.computeChild(tree: Tree<*>): Map<Side?, Tree<*>?> =
  */
 @Contract(value = "_->new", pure = true)
 infix fun Tree<*>.computeParent(tree: Tree<*>): Map<Side?, Tree<*>?> =
-    computeParent(tree.range.start, tree.range.end, tree.weight)
+    computeParent(tree.offset, tree.terminal, tree.weight)
 
 /**
  * Assuming the relation between this and [tree] is [PREVIOUS],
@@ -863,7 +880,7 @@ infix fun Tree<*>.computeParent(tree: Tree<*>): Map<Side?, Tree<*>?> =
  */
 @Contract(value = "_->new", pure = true)
 infix fun Tree<*>.computePrevious(tree: Tree<*>): Map<Side?, Tree<*>?> =
-    computePrevious(tree.range.start, tree.range.end, tree.weight)
+    computePrevious(tree.offset, tree.terminal, tree.weight)
 
 /**
  * Assuming the relation between this and [tree] is [NEXT],
@@ -882,7 +899,7 @@ infix fun Tree<*>.computePrevious(tree: Tree<*>): Map<Side?, Tree<*>?> =
  */
 @Contract(value = "_->new", pure = true)
 infix fun Tree<*>.computeNext(tree: Tree<*>): Map<Side?, Tree<*>?> =
-    computeNext(tree.range.start, tree.range.end, tree.weight)
+    computeNext(tree.offset, tree.terminal, tree.weight)
 
 //
 
