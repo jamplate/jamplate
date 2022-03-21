@@ -54,6 +54,8 @@ import java.io.Serializable
 data class Tree<T>(
     /**
      * The payload of this tree.
+     *
+     * @since 0.4.0 ~2022.03.11
      */
     var value: T,
     /**
@@ -70,6 +72,8 @@ data class Tree<T>(
     val length: Int = 0,
     /**
      * The weight of this tree.
+     *
+     * @since 0.4.0 ~2022.03.11
      */
     val weight: Int = 0
 ) : Iterable<Tree<T>>, Serializable {
@@ -160,10 +164,10 @@ val <T> Tree<T>.root: Tree<T> get() = this.parent?.root ?: this
  */
 @Contract(pure = true)
 fun <T> Tree<T>.hierarchy(): Sequence<Tree<T>> =
-    this.leftHierarchy() +
-            this.topHierarchy() +
+    this.bottomHierarchy() +
             this.rightHierarchy() +
-            this.bottomHierarchy()
+            this.leftHierarchy() +
+            this.topHierarchy()
 
 /**
  * Return a sequence of all trees related to the
@@ -187,7 +191,7 @@ fun <T> Tree<T>.bottomHierarchy(): Sequence<Tree<T>> =
 @Contract(pure = true)
 fun <T> Tree<T>.topHierarchy(): Sequence<Tree<T>> =
     generateSequence(this.top) { it.top }
-        .flatMap { sequenceOf(it) + it.leftHierarchy() + it.rightHierarchy() }
+        .flatMap { sequenceOf(it) + it.rightHierarchy() + it.leftHierarchy() }
 
 /**
  * Return a sequence of all trees related to the
