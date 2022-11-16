@@ -1,5 +1,5 @@
 /*
- *	Copyright 2022 cufy.org
+ *	Copyright 2020-2022 cufy.org
  *
  *	Licensed under the Apache License, Version 2.0 (the "License");
  *	you may not use this file except in compliance with the License.
@@ -13,7 +13,7 @@
  *	See the License for the specific language governing permissions and
  *	limitations under the License.
  */
-package org.jamplate.jamtree
+package org.jamplate.jamcore
 
 import org.jetbrains.annotations.Contract
 
@@ -74,7 +74,7 @@ import org.jetbrains.annotations.Contract
  */
 enum class Dominance {
     /**
-     * ## **CONTAIN** [(opposite)][PART]
+     * ## **CONTAIN** [(opposite)][Part]
      * Defines that a source that have the relation contains the other source in it (but
      * not exact).
      *
@@ -109,18 +109,18 @@ enum class Dominance {
      *
      * <br><br>
      *
-     * @see Relation.PARENT
-     * @see Intersection.CONTAINER
-     * @see Intersection.AHEAD
-     * @see Intersection.BEHIND
+     * @see Relation.Parent
+     * @see Intersection.Container
+     * @see Intersection.Ahead
+     * @see Intersection.Behind
      * @since 0.2.0 ~2021.01.10
      */
-    CONTAIN {
-        override val opposite: Dominance get() = PART
+    Contain {
+        override val opposite: Dominance get() = Part
     },
 
     /**
-     * ## **EXACT** [(opposite)][EXACT]
+     * ## **EXACT** [(opposite)][Exact]
      * Defines that a source that have the relation has the same relation as the other
      * source.
      *
@@ -145,16 +145,16 @@ enum class Dominance {
      *
      * <br><br>
      *
-     * @see Relation.SELF
-     * @see Intersection.SAME
+     * @see Relation.Self
+     * @see Intersection.Same
      * @since 0.2.0 ~2021.01.10
      */
-    EXACT {
-        override val opposite: Dominance get() = EXACT
+    Exact {
+        override val opposite: Dominance get() = Exact
     },
 
     /**
-     * ## **SHARE** [(opposite)][SHARE]
+     * ## **SHARE** [(opposite)][Share]
      * Defines that a source that have the relation shares some (but not all) of the other
      * source and vice versa.
      *
@@ -184,17 +184,17 @@ enum class Dominance {
      *
      * <br><br>
      *
-     * @see Relation.CLASH
-     * @see Intersection.OVERFLOW
-     * @see Intersection.UNDERFLOW
+     * @see Relation.Clash
+     * @see Intersection.Overflow
+     * @see Intersection.Underflow
      * @since 0.2.0 ~2021.01.10
      */
-    SHARE {
-        override val opposite: Dominance get() = SHARE
+    Share {
+        override val opposite: Dominance get() = Share
     },
 
     /**
-     * ## **PART** [(opposite)][CONTAIN]
+     * ## **PART** [(opposite)][Contain]
      * Defines that a source that have the relation shares some (but not all) of the other
      * source. (one but not both)
      *
@@ -229,18 +229,18 @@ enum class Dominance {
      *
      * <br><br>
      *
-     * @see Relation.CHILD
-     * @see Intersection.FRAGMENT
-     * @see Intersection.START
-     * @see Intersection.END
+     * @see Relation.Child
+     * @see Intersection.Fragment
+     * @see Intersection.Start
+     * @see Intersection.End
      * @since 0.2.0 ~2021.01.10
      */
-    PART {
-        override val opposite: Dominance get() = CONTAIN
+    Part {
+        override val opposite: Dominance get() = Contain
     },
 
     /**
-     * ## **NONE** [(opposite)][NONE]
+     * ## **NONE** [(opposite)][None]
      * Defines that a source that have the relation shares none of the other source.
      *
      * <br><br>
@@ -279,16 +279,16 @@ enum class Dominance {
      *
      * <br><br>
      *
-     * @see Relation.NEXT
-     * @see Relation.PREVIOUS
-     * @see Intersection.FRONT
-     * @see Intersection.BACK
-     * @see Intersection.AFTER
-     * @see Intersection.BEFORE
+     * @see Relation.Next
+     * @see Relation.Previous
+     * @see Intersection.Front
+     * @see Intersection.Back
+     * @see Intersection.After
+     * @see Intersection.Before
      * @since 0.2.0 ~2021.01.10
      */
-    NONE {
-        override val opposite: Dominance get() = NONE
+    None {
+        override val opposite: Dominance get() = None
     };
 
     /**
@@ -307,7 +307,7 @@ enum class Dominance {
  * about the second area.
  *
  * For example: if the second area is contained in the middle of first area,
- * then the [part][Dominance.PART] will be returned.
+ * then the [part][Dominance.Part] will be returned.
  *
  * @param i the first index of the first area.
  * @param j one past the last index of the first area.
@@ -320,13 +320,63 @@ enum class Dominance {
  * @since 0.2.0 ~2021.01.10
  */
 @Contract(pure = true)
-fun computeDominance(i: Int, j: Int, s: Int, e: Int): Dominance {
-    require(i >= 0 || s >= 0 || i <= j || s <= e) { "Illegal Indices" }
+fun Dominance(i: ULong, j: ULong, s: ULong, e: ULong): Dominance {
+    require(i <= j || s <= e) { "Illegal Indices" }
     return when {
-        i == s && j == e -> Dominance.EXACT
-        s < i && j < e || i == s && j < e || s < i && j == e -> Dominance.CONTAIN
-        i < s && e < j || i == s /* && e < j */ || i < s && j == e -> Dominance.PART
-        i < s && s < j /* && j < e */ || s < i && i < e /* && e < j */ -> Dominance.SHARE
-        /* i < j && j == s && s < e || s < e && e == i && i < j || j < s || e < i */ else -> Dominance.NONE
+        i == s && j == e -> Dominance.Exact
+        s < i && j < e || i == s && j < e || s < i && j == e -> Dominance.Contain
+        i < s && e < j || i == s /* && e < j */ || i < s && j == e -> Dominance.Part
+        i < s && s < j /* && j < e */ || s < i && i < e /* && e < j */ -> Dominance.Share
+        /* i < j && j == s && s < e || s < e && e == i && i < j || j < s || e < i */ else -> Dominance.None
     }
 }
+
+/**
+ * Compute the dominance between [range] and a range with [s] and [e].
+ *
+ * @param range the first range.
+ * @param s the first index of the second area.
+ * @param e one past the last index of the second area.
+ * @return the dominance of [s] and [e] over the first range.
+ * @throws IllegalArgumentException if `s` is not in the range `[0, e]`.
+ * @since 0.4.0 ~2022.03.12
+ */
+@Contract(pure = true)
+fun Dominance(range: BufferRange, s: ULong, e: ULong): Dominance =
+    Dominance(range.offset, range.terminal, s, e)
+
+/**
+ * Compute the dominance between [range] and the [other] range.
+ *
+ * @param range the first range.
+ * @param other the second range.
+ * @return the dominance of the second range over the first range.
+ * @since 0.4.0 ~2022.03.12
+ */
+@Contract(pure = true)
+fun Dominance(range: BufferRange, other: BufferRange): Dominance =
+    Dominance(range.offset, range.terminal, other.offset, other.terminal)
+
+/**
+ * Check if the dominance computation of the given
+ * arguments result to this dominance.
+ */
+@Contract(pure = true)
+operator fun Dominance.invoke(i: ULong, j: ULong, s: ULong, e: ULong): Boolean =
+    this == Dominance(i, j, s, e)
+
+/**
+ * Check if the dominance computation of the given
+ * arguments result to this dominance.
+ */
+@Contract(pure = true)
+operator fun Dominance.invoke(range: BufferRange, s: ULong, e: ULong): Boolean =
+    this == Dominance(range, s, e)
+
+/**
+ * Check if the dominance computation of the given
+ * arguments result to this dominance.
+ */
+@Contract(pure = true)
+operator fun Dominance.invoke(range: BufferRange, other: BufferRange): Boolean =
+    this == Dominance(range, other)

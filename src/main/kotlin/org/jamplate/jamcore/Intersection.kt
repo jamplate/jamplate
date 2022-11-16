@@ -1,5 +1,5 @@
 /*
- *	Copyright 2022 cufy.org
+ *	Copyright 2020-2022 cufy.org
  *
  *	Licensed under the Apache License, Version 2.0 (the "License");
  *	you may not use this file except in compliance with the License.
@@ -13,7 +13,7 @@
  *	See the License for the specific language governing permissions and
  *	limitations under the License.
  */
-package org.jamplate.jamtree
+package org.jamplate.jamcore
 
 import org.jetbrains.annotations.Contract
 
@@ -91,7 +91,7 @@ enum class Intersection(
     val relation: Relation
 ) {
     /**
-     * ## **CONTAINER** [(opposite)][FRAGMENT]
+     * ## **CONTAINER** [(opposite)][Fragment]
      * When the bounds of the source are contained in the bounds of the other source but
      * do not touch.
      *
@@ -116,16 +116,16 @@ enum class Intersection(
      *
      * <br><br>
      *
-     * @see Dominance.CONTAIN
-     * @see Relation.PARENT
+     * @see Dominance.Contain
+     * @see Relation.Parent
      * @since 0.2.0 ~2021.01.09
      */
-    CONTAINER(Dominance.CONTAIN, Relation.PARENT) {
-        override val opposite: Intersection get() = FRAGMENT
+    Container(Dominance.Contain, Relation.Parent) {
+        override val opposite: Intersection get() = Fragment
     },
 
     /**
-     * ## **AHEAD** [(opposite)][START]
+     * ## **AHEAD** [(opposite)][Start]
      * When the source is contained at the very start of the other source.
      *
      * <br><br>
@@ -147,16 +147,16 @@ enum class Intersection(
      *
      *      {i == s} & {j < e}
      *
-     * @see Dominance.CONTAIN
-     * @see Relation.PARENT
+     * @see Dominance.Contain
+     * @see Relation.Parent
      * @since 0.2.0 ~2021.01.09
      */
-    AHEAD(Dominance.CONTAIN, Relation.PARENT) {
-        override val opposite: Intersection get() = START
+    Ahead(Dominance.Contain, Relation.Parent) {
+        override val opposite: Intersection get() = Start
     },
 
     /**
-     * ## **BEHIND** [(opposite)][END]
+     * ## **BEHIND** [(opposite)][End]
      * When the source is contained at the very end of the other source.
      *
      * <br><br>
@@ -177,16 +177,16 @@ enum class Intersection(
      *
      * <br><br>
      *
-     * @see Dominance.CONTAIN
-     * @see Relation.PARENT
+     * @see Dominance.Contain
+     * @see Relation.Parent
      * @since 0.2.0 ~2021.01.09
      */
-    BEHIND(Dominance.CONTAIN, Relation.PARENT) {
-        override val opposite: Intersection get() = END
+    Behind(Dominance.Contain, Relation.Parent) {
+        override val opposite: Intersection get() = End
     },
 
     /**
-     * ## **SAME** [(opposite)][SAME]
+     * ## **SAME** [(opposite)][Same]
      * When the source has the exact bounds as the other source.
      *
      * <br><br>
@@ -210,16 +210,16 @@ enum class Intersection(
      *
      * <br><br>
      *
-     * @see Dominance.EXACT
-     * @see Relation.SELF
+     * @see Dominance.Exact
+     * @see Relation.Self
      * @since 0.2.0 ~2021.01.09
      */
-    SAME(Dominance.EXACT, Relation.SELF) {
-        override val opposite: Intersection get() = SAME
+    Same(Dominance.Exact, Relation.Self) {
+        override val opposite: Intersection get() = Same
     },
 
     /**
-     * ## **OVERFLOW** [(opposite)][UNDERFLOW]
+     * ## **OVERFLOW** [(opposite)][Underflow]
      * When the first fragment of the source is before the other source but the second
      * fragment is in it. (without any bound been exactly at another bound)
      *
@@ -244,16 +244,16 @@ enum class Intersection(
      *
      * <br><br>
      *
-     * @see Dominance.SHARE
-     * @see Relation.CLASH
+     * @see Dominance.Share
+     * @see Relation.Clash
      * @since 0.2.0 ~2021.01.09
      */
-    OVERFLOW(Dominance.SHARE, Relation.CLASH) {
-        override val opposite: Intersection get() = UNDERFLOW
+    Overflow(Dominance.Share, Relation.Clash) {
+        override val opposite: Intersection get() = Underflow
     },
 
     /**
-     * ## **UNDERFLOW** [(opposite)][OVERFLOW]
+     * ## **UNDERFLOW** [(opposite)][Overflow]
      * When the first fragment of the source is in the other source but the second
      * fragment is after it. (without any bound been exactly at another bound)
      *
@@ -278,16 +278,16 @@ enum class Intersection(
      *
      * <br><br>
      *
-     * @see Dominance.SHARE
-     * @see Relation.CLASH
+     * @see Dominance.Share
+     * @see Relation.Clash
      * @since 0.2.0 ~2021.01.09
      */
-    UNDERFLOW(Dominance.SHARE, Relation.CLASH) {
-        override val opposite: Intersection get() = OVERFLOW
+    Underflow(Dominance.Share, Relation.Clash) {
+        override val opposite: Intersection get() = Overflow
     },
 
     /**
-     * ## **FRAGMENT** [(opposite)][CONTAINER]
+     * ## **FRAGMENT** [(opposite)][Container]
      * When the source has its bounds containing the bounds of the other source but do not
      * touch.
      *
@@ -312,16 +312,16 @@ enum class Intersection(
      *
      * <br><br>
      *
-     * @see Dominance.PART
-     * @see Relation.CHILD
+     * @see Dominance.Part
+     * @see Relation.Child
      * @since 0.2.0 ~2021.01.09
      */
-    FRAGMENT(Dominance.PART, Relation.CHILD) {
-        override val opposite: Intersection get() = CONTAINER
+    Fragment(Dominance.Part, Relation.Child) {
+        override val opposite: Intersection get() = Container
     },
 
     /**
-     * ## **START** [(opposite)][AHEAD]
+     * ## **START** [(opposite)][Ahead]
      * When the source contains the other source at its start.
      *
      * <br><br>
@@ -345,16 +345,16 @@ enum class Intersection(
      *
      * <br><br>
      *
-     * @see Dominance.PART
-     * @see Relation.CHILD
+     * @see Dominance.Part
+     * @see Relation.Child
      * @since 0.2.0 ~2021.01.09
      */
-    START(Dominance.PART, Relation.CHILD) {
-        override val opposite: Intersection get() = AHEAD
+    Start(Dominance.Part, Relation.Child) {
+        override val opposite: Intersection get() = Ahead
     },
 
     /**
-     * ## **END** [(opposite)][BEHIND]
+     * ## **END** [(opposite)][Behind]
      * When the source contains the other source at its end.
      *
      * <br><br>
@@ -378,16 +378,16 @@ enum class Intersection(
      *
      * <br><br>
      *
-     * @see Dominance.PART
-     * @see Relation.CHILD
+     * @see Dominance.Part
+     * @see Relation.Child
      * @since 0.2.0 ~2021.01.09
      */
-    END(Dominance.PART, Relation.CHILD) {
-        override val opposite: Intersection get() = BEHIND
+    End(Dominance.Part, Relation.Child) {
+        override val opposite: Intersection get() = Behind
     },
 
     /**
-     * ## **FRONT** [(opposite)][BACK]
+     * ## **FRONT** [(opposite)][Back]
      * When the source is followed immediately by the other source.
      *
      * <br><br>
@@ -411,16 +411,16 @@ enum class Intersection(
      *
      * <br><br>
      *
-     * @see Dominance.NONE
-     * @see Relation.NEXT
+     * @see Dominance.None
+     * @see Relation.Next
      * @since 0.2.0 ~2021.01.09
      */
-    FRONT(Dominance.NONE, Relation.NEXT) {
-        override val opposite: Intersection get() = BACK
+    Front(Dominance.None, Relation.Next) {
+        override val opposite: Intersection get() = Back
     },
 
     /**
-     * ## **AFTER** [opposite][BEFORE]
+     * ## **AFTER** [opposite][Before]
      * When the other source is after the source but not immediately.
      *
      * <br><br>
@@ -444,16 +444,16 @@ enum class Intersection(
      *
      * <br><br>
      *
-     * @see Dominance.NONE
-     * @see Relation.NEXT
+     * @see Dominance.None
+     * @see Relation.Next
      * @since 0.2.0 ~2021.01.09
      */
-    AFTER(Dominance.NONE, Relation.NEXT) {
-        override val opposite: Intersection get() = BEFORE
+    After(Dominance.None, Relation.Next) {
+        override val opposite: Intersection get() = Before
     },
 
     /**
-     * ## **BACK** [(opposite)][FRONT]
+     * ## **BACK** [(opposite)][Front]
      * When the source has the other source immediately before it.
      *
      * <br><br>
@@ -477,16 +477,16 @@ enum class Intersection(
      *
      * <br><br>
      *
-     * @see Dominance.NONE
-     * @see Relation.PREVIOUS
+     * @see Dominance.None
+     * @see Relation.Previous
      * @since 0.2.0 ~2021.01.09
      */
-    BACK(Dominance.NONE, Relation.PREVIOUS) {
-        override val opposite: Intersection get() = FRONT
+    Back(Dominance.None, Relation.Previous) {
+        override val opposite: Intersection get() = Front
     },
 
     /**
-     * **BEFORE** [opposite][AFTER]
+     * **BEFORE** [opposite][After]
      * When the other source is before the source but not immediately.
      *
      * <br><br>
@@ -510,12 +510,12 @@ enum class Intersection(
      *
      * <br><br>
      *
-     * @see Dominance.NONE
-     * @see Relation.PREVIOUS
+     * @see Dominance.None
+     * @see Relation.Previous
      * @since 0.2.0 ~2021.01.09
      */
-    BEFORE(Dominance.NONE, Relation.PREVIOUS) {
-        override val opposite: Intersection get() = AFTER
+    Before(Dominance.None, Relation.Previous) {
+        override val opposite: Intersection get() = After
     };
 
     /**
@@ -534,7 +534,7 @@ enum class Intersection(
  * about the second area.
  *
  * For example: if the second area is contained in the middle of first area,
- * then [fragmnet][Intersection.FRAGMENT] will be returned.
+ * then [fragmnet][Intersection.Fragment] will be returned.
  *
  * @param i the first index of the first area.
  * @param j one past the last index of the first area.
@@ -548,27 +548,77 @@ enum class Intersection(
  * @since 0.2.0 ~2021.01.10
  */
 @Contract(pure = true)
-fun computeIntersection(i: Int, j: Int, s: Int, e: Int): Intersection {
-    require(i >= 0 || s >= 0 || i <= j || s <= e) { "Illegal Indices" }
+fun Intersection(i: ULong, j: ULong, s: ULong, e: ULong): Intersection {
+    require(i <= j || s <= e) { "Illegal Indices" }
     return when {
-        e < i -> Intersection.BEFORE
-        j < s -> Intersection.AFTER
+        e < i -> Intersection.Before
+        j < s -> Intersection.After
         i == s -> when {
-            /* i == s && */ j == e -> Intersection.SAME
-            /* i == s && */ j < e -> Intersection.AHEAD
-            /* i == s && e < j */ else -> Intersection.START
+            /* i == s && */ j == e -> Intersection.Same
+            /* i == s && */ j < e -> Intersection.Ahead
+            /* i == s && e < j */ else -> Intersection.Start
         }
         j == e -> when {
-            s < i /* && j == e */ -> Intersection.BEHIND
-            /* i < s && j == e */ else -> Intersection.END
+            s < i /* && j == e */ -> Intersection.Behind
+            /* i < s && j == e */ else -> Intersection.End
         }
-        /* s < e && */ e == i /* && i < j */ -> Intersection.BACK
-        /* i < j && */ j == s /* && s < e */ -> Intersection.FRONT
+        /* s < e && */ e == i /* && i < j */ -> Intersection.Back
+        /* i < j && */ j == s /* && s < e */ -> Intersection.Front
         s < i -> when {
-            /* s < i && */ j < e -> Intersection.CONTAINER
-            /* s < i && i < e && e < j */ else -> Intersection.UNDERFLOW
+            /* s < i && */ j < e -> Intersection.Container
+            /* s < i && i < e && e < j */ else -> Intersection.Underflow
         }
-        /* i < s && */ e < j -> Intersection.FRAGMENT
-        /* i < s && s < j && j < e */ else -> Intersection.OVERFLOW
+        /* i < s && */ e < j -> Intersection.Fragment
+        /* i < s && s < j && j < e */ else -> Intersection.Overflow
     }
 }
+
+/**
+ * Compute the intersection between [range] and a range with [s] and [e].
+ *
+ * @param range the first range.
+ * @param s the first index of the second area.
+ * @param e one past the last index of the second area.
+ * @return the intersection of [s] and [e] over the first range.
+ * @throws IllegalArgumentException if `s` is not in the range `[0, e]`.
+ * @since 0.4.0 ~2022.03.12
+ */
+@Contract(pure = true)
+fun Intersection(range: BufferRange, s: ULong, e: ULong): Intersection =
+    Intersection(range.offset, range.terminal, s, e)
+
+/**
+ * Compute the intersection between [range] and the [other] range.
+ *
+ * @param range the first range.
+ * @param other the second range.
+ * @return the intersection of the second range over the first range.
+ * @since 0.4.0 ~2022.03.12
+ */
+@Contract(pure = true)
+fun Intersection(range: BufferRange, other: BufferRange): Intersection =
+    Intersection(range.offset, range.terminal, other.offset, other.terminal)
+
+/**
+ * Check if the intersection computation of the
+ * given arguments result to this intersection.
+ */
+@Contract(pure = true)
+operator fun Intersection.invoke(i: ULong, j: ULong, s: ULong, e: ULong): Boolean =
+    this == Intersection(i, j, s, e)
+
+/**
+ * Check if the intersection computation of the
+ * given arguments result to this intersection.
+ */
+@Contract(pure = true)
+operator fun Intersection.invoke(range: BufferRange, s: ULong, e: ULong): Boolean =
+    this == Intersection(range, s, e)
+
+/**
+ * Check if the intersection computation of the
+ * given arguments result to this intersection.
+ */
+@Contract(pure = true)
+operator fun Intersection.invoke(range: BufferRange, other: BufferRange): Boolean =
+    this == Intersection(range, other)

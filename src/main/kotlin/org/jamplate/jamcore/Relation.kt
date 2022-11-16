@@ -1,5 +1,5 @@
 /*
- *	Copyright 2022 cufy.org
+ *	Copyright 2020-2022 cufy.org
  *
  *	Licensed under the Apache License, Version 2.0 (the "License");
  *	you may not use this file except in compliance with the License.
@@ -13,7 +13,7 @@
  *	See the License for the specific language governing permissions and
  *	limitations under the License.
  */
-package org.jamplate.jamtree
+package org.jamplate.jamcore
 
 import org.jetbrains.annotations.Contract
 
@@ -57,7 +57,7 @@ enum class Relation(
     private val dominance: Dominance
 ) {
     /**
-     * ## **PARENT** [(opposite)][CHILD]
+     * ## **PARENT** [(opposite)][Child]
      * When the other source can fit the source without being filled.
      *
      * <br><br>
@@ -91,18 +91,18 @@ enum class Relation(
      *
      * <br><br>
      *
-     * @see Dominance.CONTAIN
-     * @see Intersection.CONTAINER
-     * @see Intersection.AHEAD
-     * @see Intersection.BEHIND
+     * @see Dominance.Contain
+     * @see Intersection.Container
+     * @see Intersection.Ahead
+     * @see Intersection.Behind
      * @since 0.2.0 ~2021.05.14
      */
-    PARENT(Dominance.CONTAIN) {
-        override val opposite: Relation get() = CHILD
+    Parent(Dominance.Contain) {
+        override val opposite: Relation get() = Child
     },
 
     /**
-     * ## **CHILD** [(opposite)][PARENT]
+     * ## **CHILD** [(opposite)][Parent]
      * When the other source fits inside the source but is not filling it.
      *
      * <br><br>
@@ -136,18 +136,18 @@ enum class Relation(
      *
      * <br><br>
      *
-     * @see Dominance.PART
-     * @see Intersection.FRAGMENT
-     * @see Intersection.START
-     * @see Intersection.END
+     * @see Dominance.Part
+     * @see Intersection.Fragment
+     * @see Intersection.Start
+     * @see Intersection.End
      * @since 0.2.0 ~2021.05.14
      */
-    CHILD(Dominance.PART) {
-        override val opposite: Relation get() = PARENT
+    Child(Dominance.Part) {
+        override val opposite: Relation get() = Parent
     },
 
     /**
-     * ## **PREVIOUS** [(opposite)][NEXT]
+     * ## **PREVIOUS** [(opposite)][Next]
      * When the other source occurs before the source.
      *
      * <br><br>
@@ -176,17 +176,17 @@ enum class Relation(
      *
      * <br><br>
      *
-     * @see Dominance.NONE
-     * @see Intersection.BACK
-     * @see Intersection.BEFORE
+     * @see Dominance.None
+     * @see Intersection.Back
+     * @see Intersection.Before
      * @since 0.2.0 ~2021.05.14
      */
-    PREVIOUS(Dominance.NONE) {
-        override val opposite: Relation get() = NEXT
+    Previous(Dominance.None) {
+        override val opposite: Relation get() = Next
     },
 
     /**
-     * ## **NEXT** [(opposite)][PREVIOUS]
+     * ## **NEXT** [(opposite)][Previous]
      * When the other source occurs after the source.
      *
      * <br><br>
@@ -215,17 +215,17 @@ enum class Relation(
      *
      * <br><br>
      *
-     * @see Dominance.NONE
-     * @see Intersection.FRONT
-     * @see Intersection.AFTER
+     * @see Dominance.None
+     * @see Intersection.Front
+     * @see Intersection.After
      * @since 0.2.0 ~2021.05.14
      */
-    NEXT(Dominance.NONE) {
-        override val opposite: Relation get() = PREVIOUS
+    Next(Dominance.None) {
+        override val opposite: Relation get() = Previous
     },
 
     /**
-     * ## **SELF** [(opposite)][SELF]
+     * ## **SELF** [(opposite)][Self]
      * When the source is the other source.
      *
      * <br><br>
@@ -249,15 +249,15 @@ enum class Relation(
      *
      * <br><br>
      *
-     * @see Intersection.SAME
-     * @see Dominance.EXACT
+     * @see Intersection.Same
+     * @see Dominance.Exact
      */
-    SELF(Dominance.EXACT) {
-        override val opposite: Relation get() = SELF
+    Self(Dominance.Exact) {
+        override val opposite: Relation get() = Self
     },
 
     /**
-     * ## **CLASH** [(opposite)][CLASH]
+     * ## **CLASH** [(opposite)][Clash]
      * When the second source clashes with the first source.
      *
      * <br><br>
@@ -286,12 +286,12 @@ enum class Relation(
      *
      * ### Math:
      *
-     * @see Dominance.SHARE
-     * @see Intersection.OVERFLOW
-     * @see Intersection.UNDERFLOW
+     * @see Dominance.Share
+     * @see Intersection.Overflow
+     * @see Intersection.Underflow
      */
-    CLASH(Dominance.SHARE) {
-        override val opposite: Relation get() = CLASH
+    Clash(Dominance.Share) {
+        override val opposite: Relation get() = Clash
     };
 
     /**
@@ -310,7 +310,7 @@ enum class Relation(
  * about the second area.
  *
  * For example: if the second area is contained in the middle of first area,
- * then [child][Relation.CHILD] will be returned.
+ * then [child][Relation.Child] will be returned.
  *
  * @param i the first index of the first area.
  * @param j one past the last index of the first area.
@@ -323,14 +323,64 @@ enum class Relation(
  * @since 0.2.0 ~2021.05.15
  */
 @Contract(pure = true)
-fun computeRelation(i: Int, j: Int, s: Int, e: Int): Relation {
-    require(i >= 0 || s >= 0 || i <= j || s <= e) { "Illegal Indices" }
+fun Relation(i: ULong, j: ULong, s: ULong, e: ULong): Relation {
+    require(i <= j || s <= e) { "Illegal Indices" }
     return when {
-        e < i || s < e && e == i && i < j -> Relation.PREVIOUS
-        j < s || i < j && j == s && s < e -> Relation.NEXT
-        s <= i && j < e || s < i && j == e -> Relation.PARENT
-        i <= s && e < j || i < s && j == e -> Relation.CHILD
-        i == s /* && j == e */ -> Relation.SELF
-        /* i < s && s < j && j < e || s < i && i < e && e < j */ else -> Relation.CLASH
+        e < i || s < e && e == i && i < j -> Relation.Previous
+        j < s || i < j && j == s && s < e -> Relation.Next
+        s <= i && j < e || s < i && j == e -> Relation.Parent
+        i <= s && e < j || i < s && j == e -> Relation.Child
+        i == s /* && j == e */ -> Relation.Self
+        /* i < s && s < j && j < e || s < i && i < e && e < j */ else -> Relation.Clash
     }
 }
+
+/**
+ * Compute the relation between [range] and a range with [s] and [e].
+ *
+ * @param range the first range.
+ * @param s the first index of the second area.
+ * @param e one past the last index of the second area.
+ * @return the relation of [s] and [e] over the first range.
+ * @throws IllegalArgumentException if `s` is not in the range `[0, e]`.
+ * @since 0.4.0 ~2022.03.12
+ */
+@Contract(pure = true)
+fun Relation(range: BufferRange, s: ULong, e: ULong): Relation =
+    Relation(range.offset, range.terminal, s, e)
+
+/**
+ * Compute the relation between [range] and the [other] range.
+ *
+ * @param range the first range.
+ * @param other the second range.
+ * @return the relation of the second range over the first range.
+ * @since 0.4.0 ~2022.03.12
+ */
+@Contract(pure = true)
+fun Relation(range: BufferRange, other: BufferRange): Relation =
+    Relation(range.offset, range.terminal, other.offset, other.terminal)
+
+/**
+ * Check if the relation computation of the given
+ * arguments result to this relation.
+ */
+@Contract(pure = true)
+operator fun Relation.invoke(i: ULong, j: ULong, s: ULong, e: ULong): Boolean =
+    this == Relation(i, j, s, e)
+
+/**
+ * Check if the relation computation of the given
+ * arguments result to this relation.
+ */
+@Contract(pure = true)
+operator fun Relation.invoke(range: BufferRange, s: ULong, e: ULong): Boolean =
+    this == Relation(range, s, e)
+
+/**
+ * Check if the relation computation of the given
+ * arguments result to this relation.
+ */
+@Contract(pure = true)
+operator fun Relation.invoke(range: BufferRange, other: BufferRange): Boolean =
+    this == Relation(range, other)
