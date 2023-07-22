@@ -1,33 +1,18 @@
 plugins {
-    kotlin("jvm") version "1.7.21"
-    id("maven-publish")
+    kotlin("multiplatform") version libs.versions.kotlin apply false
+    kotlin("plugin.serialization") version libs.versions.kotlin apply false
 }
-
-group = "org.jamplate"
-version = "0.4.0"
 
 tasks.wrapper {
     gradleVersion = "8.2.1"
 }
 
-repositories {
-    mavenCentral()
-}
+subprojects {
+    group = "org.jamplate"
+    version = "0.4.0"
 
-dependencies {
-    implementation(kotlin("stdlib"))
-    implementation("org.jetbrains:annotations:23.0.0")
-
-    testImplementation("org.junit.jupiter:junit-jupiter:5.8.2")
-}
-
-afterEvaluate {
-    publishing {
-        publications {
-            create<MavenPublication>("maven") {
-                from(components["java"])
-                artifactId = "jamtree"
-            }
-        }
+    repositories {
+        mavenCentral()
+        maven { url = uri("https://jitpack.io") }
     }
 }
