@@ -6,6 +6,10 @@ plugins {
 group = "org.jamplate"
 version = "0.4.0"
 
+tasks.wrapper {
+    gradleVersion = "8.2.1"
+}
+
 repositories {
     mavenCentral()
 }
